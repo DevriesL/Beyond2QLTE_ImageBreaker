@@ -26,6 +26,9 @@ Copyright (C) 2015, Samsung Electronics. All rights reserved.
  */
 
 #include "ss_dsi_panel_common.h"
+#ifdef CONFIG_HYBRID_DC_DIMMING
+#include "exposure_adjustment.h"
+#endif
 
 static void ss_panel_recovery(struct samsung_display_driver_data *vdd);
 static void ss_event_osc_te_fitting(
@@ -4538,6 +4541,9 @@ int ss_brightness_dcs(struct samsung_display_driver_data *vdd, int level)
 	int need_lpm_lock = 0;
 	struct dsi_panel_cmd_set *brightness_cmds = NULL;
 	struct dsi_panel *panel = GET_DSI_PANEL(vdd);
+#ifdef CONFIG_HYBRID_DC_DIMMING
+	struct dsi_display *display = GET_DSI_DISPLAY(vdd);
+#endif
 
 	/* FC2 change: set panle mode in SurfaceFlinger initialization, instead of kenrel booting... */
 	if (!panel->cur_mode) {
@@ -4604,6 +4610,9 @@ int ss_brightness_dcs(struct samsung_display_driver_data *vdd, int level)
 	}
 
 	if (cmd_cnt) {
+#ifdef CONFIG_HYBRID_DC_DIMMING
+	ea_panel_calc_backlight(display, vdd->br.cd_level);
+#endif
 		/* setting tx cmds cmt */
 		brightness_cmds = ss_get_cmds(vdd, TX_BRIGHT_CTRL);
 		brightness_cmds->count = cmd_cnt;

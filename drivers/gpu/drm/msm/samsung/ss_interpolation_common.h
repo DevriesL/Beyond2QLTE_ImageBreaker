@@ -31,6 +31,9 @@ Copyright (C) 2012, Samsung Electronics. All rights reserved.
 
 #define AOR_HEX_STRING_CNT (sizeof(unsigned int))
 
+#define AOR_DISABLE_THRESHOLD 499
+#define GAMMA_VOLTAGE_THRESHOLD 40
+
 #define V255_START (1)
 #define V0_VT_BYTE (3)
 
