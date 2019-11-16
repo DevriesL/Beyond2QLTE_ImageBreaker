@@ -1253,6 +1253,10 @@ struct samsung_display_driver_data {
 	int ccd_fail_val;
 
 	int samsung_splash_enabled;
+
+#ifdef CONFIG_HYBRID_DC_DIMMING
+	bool dc_dimming_enable;
+#endif
 };
 
 extern struct list_head vdds_list;

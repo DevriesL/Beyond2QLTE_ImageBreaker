@@ -785,7 +785,7 @@ static int find_normal_candela(struct samsung_display_driver_data *vdd)
 		LCD_INFO("fail to find %d candela at normal.candela_table\n", candela);
 	}
 #ifdef CONFIG_HYBRID_DC_DIMMING
-	if (index > GAMMA_VOLTAGE_THRESHOLD) {
+	if (vdd->dc_dimming_enable && index > GAMMA_VOLTAGE_THRESHOLD) {
 		index = GAMMA_VOLTAGE_THRESHOLD;
 	}
 #endif
@@ -908,7 +908,7 @@ int br_interpolation_generate_event(struct samsung_display_driver_data *vdd, enu
 		break;
 	case GEN_NORMAL_INTERPOLATION_AOR:
 #ifdef CONFIG_HYBRID_DC_DIMMING
-		if (vdd->br.pac_cd_idx < AOR_DISABLE_THRESHOLD)
+		if (vdd->dc_dimming_enable && vdd->br.pac_cd_idx < AOR_DISABLE_THRESHOLD)
 			memcpy(buf, ss_itp->normal.br_aor_table[AOR_DISABLE_THRESHOLD].aor_hex_string, aor_size);
 		else
 #endif

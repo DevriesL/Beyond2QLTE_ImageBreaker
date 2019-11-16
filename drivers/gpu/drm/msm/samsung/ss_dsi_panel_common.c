@@ -4611,7 +4611,7 @@ int ss_brightness_dcs(struct samsung_display_driver_data *vdd, int level)
 
 	if (cmd_cnt) {
 #ifdef CONFIG_HYBRID_DC_DIMMING
-	ea_panel_calc_backlight(display, vdd->br.cd_level);
+		ea_panel_calc_backlight(display, vdd->dc_dimming_enable ? vdd->br.cd_level : 1024);
 #endif
 		/* setting tx cmds cmt */
 		brightness_cmds = ss_get_cmds(vdd, TX_BRIGHT_CTRL);
@@ -5078,6 +5078,10 @@ void ss_panel_init(struct dsi_panel *panel)
 	mutex_init(&vdd->exclusive_tx.ex_tx_lock);
 	vdd->exclusive_tx.enable = 0;
 	init_waitqueue_head(&vdd->exclusive_tx.ex_tx_waitq);
+
+#ifdef CONFIG_HYBRID_DC_DIMMING
+	vdd->dc_dimming_enable = true;
+#endif
 
 	ss_create_sysfs(vdd);
 

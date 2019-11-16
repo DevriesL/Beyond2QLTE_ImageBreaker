@@ -3563,6 +3563,34 @@ static ssize_t ss_stm_store(struct device *dev,
 	return size;
 }
 
+#ifdef CONFIG_HYBRID_DC_DIMMING
+static ssize_t ss_dc_dimming_store(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t size)
+{
+	int enable = 0;
+
+	struct samsung_display_driver_data *vdd =
+		(struct samsung_display_driver_data *)dev_get_drvdata(dev);
+
+	if (IS_ERR_OR_NULL(vdd)) {
+		LCD_ERR("no vdd");
+		return size;
+	}
+
+	if (sscanf(buf, "%d", &enable) != 1)
+		return size;
+
+	LCD_INFO("DC Dimming %s! (%d)\n", enable ? "Enable" : "Disable", enable);
+
+	if (enable)
+		vdd->dc_dimming_enable = true;
+	else
+		vdd->dc_dimming_enable = false;
+
+	return size;
+}
+#endif
+
 static DEVICE_ATTR(lcd_type, S_IRUGO, ss_disp_lcdtype_show, NULL);
 static DEVICE_ATTR(cell_id, S_IRUGO, ss_disp_cell_id_show, NULL);
 static DEVICE_ATTR(octa_id, S_IRUGO, ss_disp_octa_id_show, NULL);
@@ -3622,6 +3650,9 @@ static DEVICE_ATTR(spi_if_sel, S_IRUGO | S_IWUSR | S_IWGRP, NULL, ss_spi_if_sel_
 static DEVICE_ATTR(ccd_state, S_IRUGO | S_IWUSR | S_IWGRP, ss_ccd_state_show, NULL);
 static DEVICE_ATTR(isc, S_IRUGO | S_IWUSR | S_IWGRP, NULL, ss_isc_store);
 static DEVICE_ATTR(stm, S_IRUGO | S_IWUSR | S_IWGRP, NULL, ss_stm_store);
+#ifdef CONFIG_HYBRID_DC_DIMMING
+static DEVICE_ATTR(dc_dimming, S_IRUGO | S_IWUSR | S_IWGRP, NULL, ss_dc_dimming_store);
+#endif
 
 static struct attribute *panel_sysfs_attributes[] = {
 	&dev_attr_lcd_type.attr,
@@ -3681,6 +3712,9 @@ static struct attribute *panel_sysfs_attributes[] = {
 	&dev_attr_ccd_state.attr,
 	&dev_attr_isc.attr,
 	&dev_attr_stm.attr,
+#ifdef CONFIG_HYBRID_DC_DIMMING
+	&dev_attr_dc_dimming.attr,
+#endif
 	NULL
 };
 static const struct attribute_group panel_sysfs_group = {
