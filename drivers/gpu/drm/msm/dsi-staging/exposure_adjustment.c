@@ -87,16 +87,22 @@ static int ea_panel_crtc_send_pcc(struct dsi_display *display,
 
 static int ea_panel_send_pcc(struct dsi_display *display, u32 bl_lvl)
 {
-	u32 ea_coeff, r_data, g_data, b_data;
+	u32 r_data, g_data, b_data;
+	double ea_coeff, pixel_r_offset, pixel_g_offset, pixel_b_offset;
 
 	if (bl_lvl < ELVSS_OFF_THRESHOLD)
 		ea_coeff = bl_lvl * PCC_BACKLIGHT_SCALE + EXPOSURE_ADJUSTMENT_MIN;
 	else
 		ea_coeff = EXPOSURE_ADJUSTMENT_MAX;
 
-	r_data = ea_coeff;
-	g_data = ea_coeff;
-	b_data = ea_coeff;
+	// Refer to rgb_offset_star_revA
+	pixel_r_offset = 1 + (0.0941 * (ELVSS_OFF_THRESHOLD - bl_lvl) / ELVSS_OFF_THRESHOLD);
+	pixel_g_offset = 1 - (0.0039 * (ELVSS_OFF_THRESHOLD - bl_lvl) / ELVSS_OFF_THRESHOLD);
+	pixel_b_offset = 1 + (0.0706 * (ELVSS_OFF_THRESHOLD - bl_lvl) / ELVSS_OFF_THRESHOLD);
+
+	r_data = ea_coeff * pixel_r_offset;
+	g_data = ea_coeff * pixel_g_offset;
+	b_data = ea_coeff * pixel_b_offset;
 
 	return ea_panel_crtc_send_pcc(display, r_data, g_data, b_data);
 }
