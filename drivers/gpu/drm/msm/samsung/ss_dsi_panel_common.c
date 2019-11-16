@@ -4543,6 +4543,7 @@ int ss_brightness_dcs(struct samsung_display_driver_data *vdd, int level)
 	struct dsi_panel *panel = GET_DSI_PANEL(vdd);
 #ifdef CONFIG_HYBRID_DC_DIMMING
 	struct dsi_display *display = GET_DSI_DISPLAY(vdd);
+	bool dc_dimming_control = false;
 #endif
 
 	/* FC2 change: set panle mode in SurfaceFlinger initialization, instead of kenrel booting... */
@@ -4611,7 +4612,8 @@ int ss_brightness_dcs(struct samsung_display_driver_data *vdd, int level)
 
 	if (cmd_cnt) {
 #ifdef CONFIG_HYBRID_DC_DIMMING
-		ea_panel_calc_backlight(display, vdd->dc_dimming_enable ? vdd->br.cd_level : 1024);
+		dc_dimming_control = vdd->dc_dimming_enable && vdd->panel_state == PANEL_PWR_ON;
+		ea_panel_calc_backlight(display, dc_dimming_control ? vdd->br.cd_level : 1024);
 #endif
 		/* setting tx cmds cmt */
 		brightness_cmds = ss_get_cmds(vdd, TX_BRIGHT_CTRL);
